@@ -1,0 +1,84 @@
+name: Déploiement du site
+
+on:
+  schedule:
+    - cron: "0 2 * * 1"
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Trouver la dernière semaine publiée
+        id: week
+        run: |
+          YEAR=$(date +%G)
+          WEEK=$(date +%V | sed 's/^0*//')
+          FOUND=""
+          Y=$YEAR
+          W=$WEEK
+          for i in $(seq 1 200); do
+            if [ -d "$Y/$W" ] && [ -f "$Y/$W/index.html" ]; then
+              FOUND="$Y/$W"
+              break
+            fi
+            W=$((W - 1))
+            if [ "$W" -lt 1 ]; then
+              Y=$((Y - 1))
+              W=52
+            fi
+          done
+          if [ -z "$FOUND" ]; then
+            echo "Aucun dossier publié trouvé, abandon." >&2
+            exit 1
+          fi
+          echo "source=$FOUND" >> $GITHUB_OUTPUT
+
+      - name: Générer rsvp.json
+        run: |
+          YEAR=$(date +%G)
+          echo "[" > rsvp.json
+          FIRST=true
+          for WEEK_DIR in $(ls -d "$YEAR"/*/ 2>/dev/null | sort -t/ -k1 -n); do
+            WEEK=$(basename "$WEEK_DIR")
+            DIR="$YEAR/$WEEK"
+            if [ -f "$DIR/index.html" ] && [ -f "$DIR/meta.json" ]; then
+              [ "$FIRST" = false ] && echo "," >> rsvp.json
+              jq -c --arg year "$YEAR" '{year: $year, week: .week, title: .title, author: .author}' "$DIR/meta.json" >> rsvp.json
+              FIRST=false
+            fi
+          done
+          echo "]" >> rsvp.json
+
+      - name: Générer badge.json
+        run: |
+          META="${{ steps.week.outputs.source }}/meta.json"
+          jq '{schemaVersion: 1, label: "résidence actuelle", message: ("Semaine " + (.week | tostring) + " — " + .author), color: "green"}' \
+            "$META" > badge.json
+
+      - name: Préparer le dossier public
+        run: |
+          mkdir -p public
+          cp -r "${{ steps.week.outputs.source }}/"* public/
+          cp rsvp.html public/
+          cp rsvp.json public/
+          cp badge.json public/
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+      - uses: actions/deploy-pages@v4

@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="fr">
+	<head>
+		<meta charset="UTF-8" />
+		<title>Réservations</title>
+	</head>
+	<body>
+		<table>
+			<tr>
+				<th>Semaine |</th>
+				<th>Titre |</th>
+				<th>Auteurices</th>
+			</tr>
+		</table>
+
+		<p id="error"></p>
+
+		<script>
+			fetch("rsvp.json")
+				.then((r) => {
+					if (!r.ok) throw new Error("rsvp.json introuvable");
+					return r.json();
+				})
+				.then((weeks) =>
+					weeks.forEach((w) => {
+						document
+							.querySelector("table")
+							.insertAdjacentHTML(
+								"beforeend",
+								`<tr><td>${w.year}/${w.week} |</td><td>${w.title}</td><td>| ${w.author}</td></tr>`,
+							);
+					}),
+				)
+				.catch((err) => {
+					document.getElementById("error").textContent =
+						"Erreur : le fichier rsvp.json n'existe pas ou n'a pas pu être chargé correctement.";
+				});
+		</script>
+	</body>
+</html>
