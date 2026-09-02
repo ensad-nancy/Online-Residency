@@ -29,7 +29,7 @@ Choisissez l’année et la semaine que vous souhaitez réserver. Si cette semai
 
 1. _Forker_ le dépôt
 
-   Sur la page GitHub ensad-nancy/Online-Residency, cliquer sur Fork (en haut à droite).
+   Sur la page GitHub, cliquer sur Fork (en haut à droite).
 
 2. Cloner le fork en local
 
