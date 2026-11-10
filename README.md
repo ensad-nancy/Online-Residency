@@ -1,4 +1,4 @@
-# Résidence étudiante
+# Dear Reader, welcome
 
 Cette résidence numérique à l’usage des étudiant·es de l’option communication visuelle de l’ENSAD Nancy est visible sur la page d’accueil du site de notre option. Elle permet un espace de diffusion et d’expression libre à toustes, promesse du web.
 
