@@ -44,11 +44,10 @@ cd Online-Residency
 git checkout -b 2026-38
 ```
 
-4. Ajouter les fichiers
-   Dans `ANNEE/SEMAINE/` (par ex. 2026/38/) :
-   - index.html (obligatoire) + fichiers annexes (images, css, js)
-   - meta.json rempli correctement
-   - supprimer le .gitkeep du dossier
+4. Ajouter les fichiers dans `ANNEE/SEMAINE/` (par ex. 2026/38/) :
+   - `index.html` (obligatoire) + fichiers annexes (images, css, js)
+   - `meta.json` correctement renseigné
+   - le `.gitkeep` doit être supprimé du dossier
 
 5. Commit
 
